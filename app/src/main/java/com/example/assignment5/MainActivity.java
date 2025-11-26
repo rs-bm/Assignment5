@@ -39,14 +39,21 @@ public class MainActivity extends AppCompatActivity {
     Button clearB;
     ImageView iv;
     ConstraintLayout profile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        watchlist = new ArrayList<>();
         setContentView(R.layout.activity_main);
         searchET = findViewById(R.id.searchET);
         searchB = findViewById(R.id.searchB);
-        searchB.setOnClickListener(searchListener);
         clearB = findViewById(R.id.clearB);
+        watchlistLV = findViewById(R.id.watchlistLV);
+        iv = findViewById(R.id.logoView);
+        profile = findViewById(R.id.profileLayout);
+        profile.setVisibility(INVISIBLE);
+
+        searchB.setOnClickListener(searchListener);
         clearB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,10 +61,6 @@ public class MainActivity extends AppCompatActivity {
                 searchET.setText("");
             }
         });
-        iv = findViewById(R.id.logoView);
-        profile = findViewById(R.id.profileLayout);
-        profile.setVisibility(INVISIBLE);
-        watchlistLV = findViewById(R.id.watchlistLV);
         watchlistLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -65,15 +68,15 @@ public class MainActivity extends AppCompatActivity {
                 getPkmn(s.substring(0, s.indexOf(" ")));
             }
         });
-        watchlist = new ArrayList<>();
     }
+
     private void getPkmn(String s) {
         ANRequest req = AndroidNetworking.get("https://pokeapi.co/api/v2/pokemon/" + s + "/").setPriority(Priority.LOW).build();
         req.getAsJSONObject(new JSONObjectRequestListener() {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 try {
-                    // Populate listview on left side (if pokemon is not a duplicate)
+                    // Add pokemon to watchlist (if not a duplicate)
                     int id = jsonObject.getInt("id");
                     String row = String.format("%-10s", id) + jsonObject.getString("name");
                     if (!watchlist.contains(row)) {
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     String imageURL = "https://raw.githubusercontent.com/HybridShivam/Pokemon/master/assets/images/" + String.format("%03d", id) + ".png";
                     ImageView iv = findViewById(R.id.logoView);
                     Picasso.get().load(imageURL).into(iv);
-                    // Show profile
+                    // Display profile
                     profile.setVisibility(VISIBLE);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -126,11 +129,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
     private boolean validSearch(String s) {
         if (s.isBlank()) {
             return false;
-        }
-        else if (!s.matches("^[^%&*(@)!;:<>]*$")) {
+        } else if (!s.matches("^[^%&*(@)!;:<>]*$")) {
             Toast.makeText(getApplicationContext(), "Search contains invalid characters", Toast.LENGTH_SHORT).show();
             return false;
         }
