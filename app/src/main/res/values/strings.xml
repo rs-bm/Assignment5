@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Assignment5</string>
     <string name="search">Search</string>
-    <string name="enter_a_name_or_id">Enter a name or id...</string>
+    <string name="search_by_name_or_id">Search by name or id...</string>
 </resources>
